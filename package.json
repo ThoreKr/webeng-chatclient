@@ -1,0 +1,48 @@
+{
+  "name": "WebEng-Chatclient",
+  "description": "A chatclient assignment for Webengineering",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ThoreKr/webeng-chatclient"
+  },
+  "contributors": [
+    {
+      "name": "Thore Kruess",
+      "email": "thore@kruess.xyz"
+    },
+    {
+      "name": "Daniel Rutz",
+      "email": "info@danielrutz.com"
+    }
+  ],
+  "scripts": {
+    "test": "npm-run-all -c test:* lint",
+    "test:mocha": "mocha",
+    "lint": "npm-run-all -c lint:*",
+    "lint:js": "eslint .",
+    "lint:css": "stylelint \"**/*.css\""
+  },
+  "keywords": [
+    "websockets",
+    "chat"
+  ],
+  "license": "GPL-3.0",
+  "engines": {
+    "node": ">=4.2.0"
+  },
+  "dependencies": {
+    "semver": "latest"
+  },
+  "devDependencies": {
+    "eslint": "latest",
+    "eslint-config-standard": "latest",
+    "eslint-plugin-standard": "latest",
+    "eslint-plugin-import": "latest",
+    "eslint-plugin-node": "latest",
+    "eslint-plugin-promise": "latest",
+    "jasmine-core": "latest",
+    "npm-run-all": "latest",
+    "stylelint": "latest"
+  }
+}
