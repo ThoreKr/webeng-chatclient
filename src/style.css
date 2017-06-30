@@ -1,0 +1,80 @@
+body {
+	background: #202020;
+}
+
+#standard-container {
+	height: 85%;
+	width: 85%;
+	margin: 5%;
+	background: #282828;
+	color: white;
+}
+
+#layout-container {
+	height: 100%;
+	width: 100%;
+}
+
+.sidebar {
+	height: 100%;
+	background: #404040;
+}
+
+#user-sidebar {
+	width: 10%;
+	float: right;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+#channel-sidebar {
+	width: 20%;
+	float: left;
+}
+
+.channel {
+	text-align: center;
+	margin: 2%;
+	background: #8888;
+	font: black;
+	border: solid 2px #686868;
+}
+
+#content-wrapper {
+	width: 70%;
+	height: 95%;
+	margin-left: 20%;
+	margin-right: 15%;
+}
+
+#content {
+	width: 98%;
+	height: 100%;
+	margin-left: 1%;
+	margin-right: 1%;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+.message {
+	word-break: break-all;
+}
+
+.time {
+	float: left;
+	color: grey;
+	padding-right: 4px;
+}
+
+.sender {
+	float: left;
+	color: violet;
+	padding-right: 4px;
+}
+
+#chatInput {
+	width: 68%;
+	height: 30px;
+	margin-left: 1%;
+	margin-top: 1%;
+}

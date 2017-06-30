@@ -1,0 +1,34 @@
+<html>
+<head>
+	<meta charset="utf8mb4" />
+	<title>A crappy chat client</title>
+	<link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="src/style.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0/angular.js"></script>
+	<script src="app/app.js"></script>
+</head>
+<body ng-app="crappyChat" ng-controller="chatCtrl">
+	<div id="standard-container">
+		<div id="layout-container" layout="row" layout-align="center center">
+			<div id="channel-sidebar" class="sidebar" layout="column" layout-align="center start">
+				<div class="channel" ng-repeat="channel in channels">{{ channel }}</div>
+			</div>
+			<div id="user-sidebar" class="sidebar" layout="row" layout-align="center center">
+				<div class="sender" ng-repeat="user in users" style="color: #{{colorUser(user.name)}}; float: none;">{{user.name}}</div>
+			</div> 
+			<div id="content-wrapper">
+				<div id="content">
+				<div class="message" ng-repeat="message in messages">
+					<div class="time">{{message.time}}</div>
+					<div class="sender" style="color: #{{colorUser(message.sender)}};"><{{message.sender}}></div>
+					{{message.text}}
+				</div>
+			</div>
+			</div>
+			<form ng-submit="sendMessage()" autocomplete="off">
+				<input id="chatInput" type="text" ng-model="chatInput" placeholder="Your message" required ng-keyup="$event.keycode === 13 && sendMessage();">
+			</form>
+		</div>
+	</div>
+</body>
+</html>
