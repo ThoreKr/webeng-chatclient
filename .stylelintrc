@@ -1,6 +1,6 @@
 {
 	"ignoreFiles": [
-		"vendor/*.css",
+		"vendor/*.css"
 	],
 	"rules": {
 		"at-rule-empty-line-before": ["always", {
@@ -60,7 +60,7 @@
 		"declaration-block-no-shorthand-property-overrides": true,
 		"rule-empty-line-before": ["always-multi-line", {
 			"except": ["first-nested"],
-			"ignore": ["after-comment"],
+			"ignore": ["after-comment"]
 		}],
 		"declaration-block-trailing-semicolon": "always",
 		"selector-combinator-space-after": "always",
