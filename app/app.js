@@ -16,7 +16,7 @@ angular.module("crappyChat", []).controller("chatCtrl", ['$scope', '$http', func
 	$scope.apiPassword = "dhbw-pw";
 	$scope.channels = ["Lobby"];
 	$scope.messages = [];
-	$scope.users = [{"name":"someone"},{"name":"someoneElse"}, {"name": $scope.username}];
+	$scope.users = [];
 	$scope.currentChannel = "Lobby";
 
 	$scope.sendMessage = function() {
@@ -62,10 +62,6 @@ angular.module("crappyChat", []).controller("chatCtrl", ['$scope', '$http', func
 		});
 	}
 
-	// Poll Messages
-	$scope.fetchMessages();
-	setInterval($scope.fetchMessages, 1000);
-
 	$scope.fetchChannels = function() {
 		$http.get($scope.endpoint,
 			{
@@ -80,10 +76,6 @@ angular.module("crappyChat", []).controller("chatCtrl", ['$scope', '$http', func
 		});
 	}
 
-	// Poll channels
-	$scope.fetchChannels();
-	setInterval($scope.fetchChannels, 5000);
-
 	$scope.setCurrentChannel = function(channel) {
 		if ($scope.channels.indexOf(channel) === -1)
 		{
@@ -94,5 +86,30 @@ angular.module("crappyChat", []).controller("chatCtrl", ['$scope', '$http', func
 
 		// Force poll
 		$scope.fetchMessages();
+		$scope.fetchUsers();
 	}
+
+	$scope.fetchUsers = function() {
+		$http.get($scope.endpoint + $scope.currentChannel + "/users",
+			{
+				headers: {
+					Authorization: 'Basic ' + btoa($scope.apiUser + ':' + $scope.apiPassword)
+				}
+			}).then(response => {
+			$scope.users = response.data;
+			return response.data;
+		}, response => {
+			console.error('An error occured. Server responded: ' + response.status.toString() + ' ' + response.statusText);
+		});
+	}
+
+	// Poll Messages
+	$scope.fetchMessages();
+	setInterval($scope.fetchMessages, 1000);
+	// Poll channels
+	$scope.fetchChannels();
+	setInterval($scope.fetchChannels, 5000);
+	// Poll users
+	$scope.fetchUsers();
+	setInterval($scope.fetchUsers, 1000);
 }]);

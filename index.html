@@ -15,7 +15,7 @@
 				<div class="channel" ng-repeat="channel in channels" ng-click="setCurrentChannel(channel)">{{channel}}</div>
 			</div>
 			<div id="user-sidebar" class="sidebar" layout="row" layout-align="center center">
-				<div class="sender" ng-repeat="user in users" style="color: #{{colorUser(user.name)}}; float: none;">{{user.name}}</div>
+				<div class="sender" ng-repeat="user in users" style="color: #{{colorUser(user)}}; float: none;">{{user}}</div>
 			</div> 
 			<div id="content-wrapper">
 				<div id="content">
