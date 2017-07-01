@@ -62,6 +62,7 @@ angular.module("crappyChat", []).controller("chatCtrl", ['$scope', '$http', func
 		});
 	}
 
+	// Poll Messages
 	$scope.fetchMessages();
 	setInterval($scope.fetchMessages, 1000);
 
@@ -78,15 +79,20 @@ angular.module("crappyChat", []).controller("chatCtrl", ['$scope', '$http', func
 			console.error('An error occured. Server responded: ' + response.status.toString() + ' ' + response.statusText);
 		});
 	}
+
+	// Poll channels
 	$scope.fetchChannels();
 	setInterval($scope.fetchChannels, 5000);
 
 	$scope.setCurrentChannel = function(channel) {
-		if ($scope.channels.indexOf(channel) == -1)
+		if ($scope.channels.indexOf(channel) === -1)
 		{
 			console.error("Channel " + channel + " does not exist!");
 			return;
 		}
 		$scope.currentChannel = channel;
+
+		// Force poll
+		$scope.fetchMessages();
 	}
 }]);
