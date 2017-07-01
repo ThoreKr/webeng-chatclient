@@ -13,6 +13,8 @@ var app = angular.module("crappyChat", []);
 
 app.controller("chatCtrl", function($scope) {
 	$scope.username = "me" // get this from login
+	$scope.apiUser = "dhbw";
+	$scope.apiPassword = "dhbw-pw";
 	$scope.channels = [ "a","b","c" ]; // do some get channels api magic here
 	$scope.messages = [{"sender": "someone", "time":"now", "text":"I hate this"},{"sender": "someoneElse", "time":"later", "text":"I hate this too"}];
 	$scope.users = [{"name":"someone"},{"name":"someoneElse"}, {"name": $scope.username}];
@@ -32,5 +34,22 @@ app.controller("chatCtrl", function($scope) {
 	$scope.colorUser = function(userName) {
 		return userName.hashCode().toString(16).slice(0,6);
 		
+	}
+
+	$scope.fetchChannels = function() {
+		var opts = {
+			method: 'GET',
+			headers: {
+				'Authorization': 'Basic ' + btoa($scope.apiUser, ":", $scope.apiPassword),
+				'Content-Type': 'application/x-www-form-urlencoded'
+			}};
+		fetch("http://liebknecht.danielrutz.com:3000/api/chats/",opts)
+			//.then(response => response.json())
+			.then(data => {
+				return data;
+			})
+			.catch(err => {
+				console.error("An error ocurred:", err);
+			});
 	}
 });
