@@ -21,7 +21,7 @@
 				<div id="content">
 				<div class="message" ng-repeat="message in messages">
 					<div class="timestamp">{{message.timestamp | date: 'HH:mm:ss'}}</div>
-					<div class="user" style="color: #{{colorUser(message.sender)}};"><{{message.user}}></div>
+					<div class="user" style="color: #{{colorUser(message.user)}};"><{{message.user}}></div>
 					{{message.message}}
 				</div>
 			</div>
