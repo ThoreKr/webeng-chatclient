@@ -32,14 +32,6 @@ body {
 	float: left;
 }
 
-.channel {
-	text-align: center;
-	margin: 2%;
-	background: #8888;
-	font: black;
-	border: solid 2px #686868;
-}
-
 #content-wrapper {
 	width: 70%;
 	height: 95%;
@@ -77,4 +69,21 @@ body {
 	height: 30px;
 	margin-left: 1%;
 	margin-top: 1%;
+}
+
+.md-button {
+	padding: 0 6px 0 6px;
+	margin: 2% 1% 2% 1%;
+	width: 98%;
+	border-radius: 3px;
+	font-size: 14px;
+	text-align: center;
+	text-transform: uppercase;
+	text-decoration: none;
+	border: none;
+	outline: none;
+}
+
+.md-button:not([disabled]):hover {
+	background-color: rgba(158, 158, 158, 0.2);
 }
