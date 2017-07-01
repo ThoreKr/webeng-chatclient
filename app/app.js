@@ -9,8 +9,12 @@ String.prototype.hashCode = function() {
 	return hash >>> 0;
 }
 
+function messagesEqual(message1, message2) {
+	return ((message1.message === message2.message) && (message1.timestamp === message2.timestamp) && (message1.user === message2.user));
+}
+
 angular.module("crappyChat", []).controller("chatCtrl", ['$scope', '$http', function($scope, $http) {
-	$scope.endpoint = "http://[2a03:4000:6:12db:dead:beef:abad:1dea]:3000/api/chats/";
+	$scope.endpoint = "http://liebknecht.danielrutz.com:3000/api/chats/";
 	$scope.username = "me" // get this from login
 	$scope.apiUser = "dhbw";
 	$scope.apiPassword = "dhbw-pw";
@@ -18,6 +22,8 @@ angular.module("crappyChat", []).controller("chatCtrl", ['$scope', '$http', func
 	$scope.messages = [];
 	$scope.users = [];
 	$scope.currentChannel = "Lobby";
+
+	$http.defaults.headers.common.Authorization = 'Basic ' + btoa($scope.apiUser + ':' + $scope.apiPassword);
 
 	$scope.sendMessage = function() {
 		// Clear line
@@ -32,7 +38,6 @@ angular.module("crappyChat", []).controller("chatCtrl", ['$scope', '$http', func
 			}),
 			{
 				headers: {
-					'Authorization': 'Basic ' + btoa($scope.apiUser + ':' + $scope.apiPassword),
 					'Content-Type': 'application/json'
 				}
 			}).then(response => {
@@ -45,16 +50,36 @@ angular.module("crappyChat", []).controller("chatCtrl", ['$scope', '$http', func
 	
 	$scope.colorUser = function(userName) {
 		return userName.hashCode().toString(16).slice(0,6);
-		
+	}
+
+	// check whether we are allowed to send notifications
+	if (Notification.permission !== 'granted') {
+		Notification.requestPermission();
+	}
+
+	$scope.notfiyOnNewMessage = function(newMessageArray) {
+		let newMessages = newMessageArray.filter(function(message) {
+			for (let oldMessageIndex in $scope.messages) {
+				if (messagesEqual(message, $scope.messages[oldMessageIndex])) {
+					return false;
+				}
+			}
+			return true;
+		});
+		if (newMessages.length > 0) {
+			let bodyString = '';
+			newMessages.forEach(message => bodyString += (message.user + ' wrote: ' + message.message.substring(0, 20) + '...\n'));
+			new Notification(newMessages.length.toString() + ' new message(s)!', {
+				body: bodyString
+			});
+		}
 	}
 
 	$scope.fetchMessages = function() {
-		$http.get($scope.endpoint + $scope.currentChannel,
-			{
-				headers: {
-					Authorization: 'Basic ' + btoa($scope.apiUser + ':' + $scope.apiPassword)
-				}
-			}).then(response => {
+		$http.get($scope.endpoint + $scope.currentChannel).then(response => {
+			if($scope.messages.length > 0) { // only show notification when we didn't just switch to that channel
+				$scope.notfiyOnNewMessage(response.data);
+			}
 			$scope.messages = response.data;
 			return response.data;
 		}, response => {
@@ -63,12 +88,7 @@ angular.module("crappyChat", []).controller("chatCtrl", ['$scope', '$http', func
 	}
 
 	$scope.fetchChannels = function() {
-		$http.get($scope.endpoint,
-			{
-				headers: {
-					Authorization: 'Basic ' + btoa($scope.apiUser + ':' + $scope.apiPassword)
-				}
-			}).then(response => {
+		$http.get($scope.endpoint).then(response => {
 			$scope.channels = response.data;
 			return response.data;
 		}, response => {
@@ -83,6 +103,7 @@ angular.module("crappyChat", []).controller("chatCtrl", ['$scope', '$http', func
 			return;
 		}
 		$scope.currentChannel = channel;
+		$scope.messages = [];
 
 		// Force poll
 		$scope.fetchMessages();
@@ -90,12 +111,7 @@ angular.module("crappyChat", []).controller("chatCtrl", ['$scope', '$http', func
 	}
 
 	$scope.fetchUsers = function() {
-		$http.get($scope.endpoint + $scope.currentChannel + "/users",
-			{
-				headers: {
-					Authorization: 'Basic ' + btoa($scope.apiUser + ':' + $scope.apiPassword)
-				}
-			}).then(response => {
+		$http.get($scope.endpoint + $scope.currentChannel + "/users").then(response => {
 			$scope.users = response.data;
 			return response.data;
 		}, response => {
