@@ -13,17 +13,51 @@ function messagesEqual(message1, message2) {
 	return ((message1.message === message2.message) && (message1.timestamp === message2.timestamp) && (message1.user === message2.user));
 }
 
-angular.module("crappyChat", []).controller("chatCtrl", ['$scope', '$http', function($scope, $http) {
+var app = angular.module("crappyChat", ["ngAnimate", "ngAria", "ngMessages", "ngMaterial"]);
+
+app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', function($scope, $http, $mdDialog) {
 	$scope.endpoint = "http://liebknecht.danielrutz.com:3000/api/chats/";
-	$scope.username = "me" // get this from login
+	$scope.locked = true;
+	$scope.customFullscreen = false;
+	$scope.username = "" // get this from login
 	$scope.apiUser = "dhbw";
 	$scope.apiPassword = "dhbw-pw";
 	$scope.channels = ["Lobby"];
 	$scope.messages = [];
 	$scope.users = [];
 	$scope.currentChannel = "Lobby";
-
 	$http.defaults.headers.common.Authorization = 'Basic ' + btoa($scope.apiUser + ':' + $scope.apiPassword);
+
+	$scope.login = function() {
+		if ($scope.loginUser != null) {
+			$scope.username = $scope.loginUser;
+			$scope.apiUser = $scope.loginApiUser;
+			$scope.apiPassword = $scope.loginApiPassword;
+			if (testApiCredentials()) {
+				$scope.locked = false;
+			}
+		}
+	}
+
+	$scope.showLogin = function(ev) {
+		$mdDialog.show({
+			controller: DialogController,
+			templateUrl: 'app/templates/login-form.tmpl.html',
+			parent: angular.element(document.body),
+			targetEvent: ev,
+			clickOutsideToClose: false,
+			fullscreen: $scope.customFullscreen
+		})
+		.then(
+			function(result) {
+				console.log(result);
+			},
+			function() {
+				$scope.locked = true;
+				console.log("Cancelled");
+			}
+		);
+	};
 
 	$scope.sendMessage = function() {
 		// Clear line
@@ -128,4 +162,16 @@ angular.module("crappyChat", []).controller("chatCtrl", ['$scope', '$http', func
 	// Poll users
 	$scope.fetchUsers();
 	setInterval($scope.fetchUsers, 1000);
+
+	function DialogController($scope, $mdDialog) {
+		$scope.hide = function() {
+			$mdDialog.hide();
+		};
+		$scope.cancel = function() {
+			$mdDialog.cancel();
+		};
+		$scope.answer = function() {
+			$mdDialog.hide();
+		};
+  	}
 }]);
