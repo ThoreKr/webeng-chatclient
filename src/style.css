@@ -3,21 +3,32 @@ body {
 }
 
 #standard-container {
-	height: 85%;
-	width: 85%;
-	margin: 5%;
-	background: #282828;
+	height: 95%;
+	width: 90%;
+	margin-right: 5%;
+	margin-left: 5%;
 	color: white;
 }
 
-#layout-container {
-	height: 100%;
+#login-container {
+	height: 10%;
 	width: 100%;
+}
+
+#layout-container {
+	height: 90%;
+	width: 100%;
+	background: #282828;
 }
 
 .sidebar {
 	height: 100%;
 	background: #404040;
+}
+
+#channel-sidebar {
+	width: 20%;
+	float: left;
 }
 
 #user-sidebar {
@@ -27,9 +38,16 @@ body {
 	overflow-y: auto;
 }
 
-#channel-sidebar {
-	width: 20%;
-	float: left;
+.user-sidebar-sender {
+	float: none;
+	margin: 2%;
+	text-decoration: none;
+	font-size: 125%;
+	padding: 2%;
+}
+
+.user-sidebar-sender:hover {
+	background-color: rgba(158, 158, 158, 0.2);
 }
 
 #content-wrapper {

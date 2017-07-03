@@ -1,29 +1,38 @@
-<md-dialog aria-label="Mango (Fruit)">
-  <form ng-cloak>
-    <md-toolbar>
-      <div class="md-toolbar-tools">
-        <h2>Login</h2>
-        <span flex></span>
-      </div>
-    </md-toolbar>
+<md-dialog aria-label="Login Form">
+	<form ng-cloak>
+		<md-toolbar>
+			<div class="md-toolbar-tools">
+				<h2>Login</h2>
+				<span flex></span>
+			</div>
+		</md-toolbar>
 
-    <md-dialog-content layout="row" layout-align="center center">
-      <div class="md-dialog-content">
-        <h2>Log-in to the Chat-Client</h2>
-        <p> Usually the API credentials are "dhbw"/"dhbw-pw" </p>
-        <input id="username" type="text" ng-model="username" placeholder="Your shitty nick" required>
-        <input id="apiUser" type="text" ng-model="loginApiUser" placeholder="API Username" required>
-        <input id="apiPw" type="text" ng-model="loginApiPassword" placeholder="API Password" required>
-      </div>
-    </md-dialog-content>
+		<md-dialog-content layout="row" layout-align="center center">
+			<div class="md-dialog-content">
+				<h2>Log-in to the Chat-Client</h2>
+				<p> Usually the API credentials are "dhbw"/"dhbw-pw" </p>
+				<md-input-container class="md-block" flex-gt-sm>
+						<label>Your shitty nick</label>
+						<input id="username" type="text" ng-model="loginUser" required>
+				</md-input-container>
+				<md-input-container class="md-block" flex-gt-sm>
+						<label>API Username</label>
+						<input id="apiUser" type="text" ng-model="loginApiUser" required>
+				</md-input-container>
+				<md-input-container class="md-block" flex-gt-sm>
+						<label>API Password</label>
+						<input id="apiPw" type="password" ng-model="loginApiPassword" required>
+				</md-input-container>
+			</div>
+		</md-dialog-content>
 
-    <md-dialog-actions layout="row">
-      <md-button ng-click="cancel()">
-       Close
-      </md-button>
-      <md-button ng-click="answer()">
-        Log Me In Scotty
-      </md-button>
-    </md-dialog-actions>
-  </form>
+		<md-dialog-actions layout="row">
+			<md-button ng-click="cancel()">
+			 Close
+			</md-button>
+			<md-button ng-click="answer(loginUser, loginApiUser, loginApiPassword)">
+				Log Me In Scotty
+			</md-button>
+		</md-dialog-actions>
+	</form>
 </md-dialog>

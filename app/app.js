@@ -19,25 +19,14 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', function($scope, $ht
 	$scope.endpoint = "http://liebknecht.danielrutz.com:3000/api/chats/";
 	$scope.locked = true;
 	$scope.customFullscreen = false;
-	$scope.username = "" // get this from login
-	$scope.apiUser = "dhbw";
-	$scope.apiPassword = "dhbw-pw";
-	$scope.channels = ["Lobby"];
+	$scope.userName = "" // get this from login
+	$scope.apiUser = "";
+	$scope.apiPassword = "";
+	$scope.channels = [""];
 	$scope.messages = [];
 	$scope.users = [];
 	$scope.currentChannel = "Lobby";
 	$http.defaults.headers.common.Authorization = 'Basic ' + btoa($scope.apiUser + ':' + $scope.apiPassword);
-
-	$scope.login = function() {
-		if ($scope.loginUser != null) {
-			$scope.username = $scope.loginUser;
-			$scope.apiUser = $scope.loginApiUser;
-			$scope.apiPassword = $scope.loginApiPassword;
-			if (testApiCredentials()) {
-				$scope.locked = false;
-			}
-		}
-	}
 
 	$scope.showLogin = function(ev) {
 		$mdDialog.show({
@@ -47,10 +36,15 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', function($scope, $ht
 			targetEvent: ev,
 			clickOutsideToClose: false,
 			fullscreen: $scope.customFullscreen
-		})
-		.then(
+		}).then(
 			function(result) {
-				console.log(result);
+				if (result.userName != null) {
+					$scope.userName = result.userName;
+					$scope.apiUser = result.apiUser;
+					$scope.apiPassword = result.apiPassword;
+					$http.defaults.headers.common.Authorization = 'Basic ' + btoa($scope.apiUser + ':' + $scope.apiPassword);
+					checkApiCredentials()
+				}	
 			},
 			function() {
 				$scope.locked = true;
@@ -59,23 +53,60 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', function($scope, $ht
 		);
 	};
 
-	$scope.sendMessage = function() {
-		// Clear line
-		var message = $scope.chatInput;
-		$scope.chatInput = null;
+	// On load launch login form
+	$scope.showLogin();
 
+	$scope.showLoginAlert = function(ev) {
+		$mdDialog.show(
+			$mdDialog.alert()
+				.parent(angular.element(document.querySelector('#layoutContainer')))
+				.clickOutsideToClose(true)
+				.title('Login Error')
+				.textContent('I\'m afraid I can\'t do that, Dave')
+				.ariaLabel('Login Error')
+				.ok('Shit!')
+				.targetEvent(ev)
+		);
+	};
+
+	$scope.createChannel = function(ev) {
+		// Appending dialog to document.body to cover sidenav in docs app
+		var confirm = $mdDialog.prompt()
+			.title('Join a new Channel')
+			.textContent('How is the channel called?')
+			.placeholder('MyChannel')
+			.ariaLabel('Channel Name')
+			.initialValue('')
+			.targetEvent(ev)
+			.ok('Join!')
+			.cancel('Close');
+
+		$mdDialog.show(confirm).then(function(result) {
+			$scope.channels.push(result);
+			$scope.currentChannel = result;
+			$scope.sendMessage("has joined the channel.")
+
+			}, function() {
+		});
+	};
+
+	$scope.sendMessage = function(message) {
+		// Clear line
+		if (!message){
+			message = $scope.chatInput;
+			$scope.chatInput = null;
+		}
 		// POST it
 		$http.post($scope.endpoint + $scope.currentChannel,
 			JSON.stringify({
 				"message": message,
-				"user": $scope.username
+				"user": $scope.userName
 			}),
 			{
 				headers: {
 					'Content-Type': 'application/json'
 				}
 			}).then(response => {
-			console.log('successfully sent message');
 			$scope.messages = response.data;
 		}, response => {
 			console.error('An error occured. Server responded: ' + response.status.toString() + ' ' + response.statusText);
@@ -84,11 +115,6 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', function($scope, $ht
 	
 	$scope.colorUser = function(userName) {
 		return userName.hashCode().toString(16).slice(0,6);
-	}
-
-	// check whether we are allowed to send notifications
-	if (Notification.permission !== 'granted') {
-		Notification.requestPermission();
 	}
 
 	$scope.notfiyOnNewMessage = function(newMessageArray) {
@@ -110,6 +136,9 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', function($scope, $ht
 	}
 
 	$scope.fetchMessages = function() {
+		if ($scope.locked) {
+			return;
+		}
 		$http.get($scope.endpoint + $scope.currentChannel).then(response => {
 			if($scope.messages.length > 0) { // only show notification when we haven't just switched to that channel
 				$scope.notfiyOnNewMessage(response.data);
@@ -122,6 +151,9 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', function($scope, $ht
 	}
 
 	$scope.fetchChannels = function() {
+		if ($scope.locked) {
+			return;
+		}
 		$http.get($scope.endpoint).then(response => {
 			$scope.channels = response.data;
 			return response.data;
@@ -145,6 +177,9 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', function($scope, $ht
 	}
 
 	$scope.fetchUsers = function() {
+		if ($scope.locked) {
+			return;
+		}
 		$http.get($scope.endpoint + $scope.currentChannel + "/users").then(response => {
 			$scope.users = response.data;
 			return response.data;
@@ -153,15 +188,10 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', function($scope, $ht
 		});
 	}
 
-	// Poll Messages
-	$scope.fetchMessages();
-	setInterval($scope.fetchMessages, 1000);
-	// Poll channels
-	$scope.fetchChannels();
-	setInterval($scope.fetchChannels, 5000);
-	// Poll users
-	$scope.fetchUsers();
-	setInterval($scope.fetchUsers, 1000);
+	// check whether we are allowed to send notifications
+	if (Notification.permission !== 'granted') {
+		Notification.requestPermission();
+	}
 
 	function DialogController($scope, $mdDialog) {
 		$scope.hide = function() {
@@ -170,8 +200,30 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', function($scope, $ht
 		$scope.cancel = function() {
 			$mdDialog.cancel();
 		};
-		$scope.answer = function() {
-			$mdDialog.hide();
+		$scope.answer = function(userName, apiUser, apiPassword) {
+			var result = {};
+			result.userName = userName;
+			result.apiUser = apiUser;
+			result.apiPassword = apiPassword;
+			$mdDialog.hide(result);
 		};
-  	}
+	}
+
+	function checkApiCredentials() {
+		$http.get($scope.endpoint).then(response => {
+			$scope.locked = false;
+			// Poll Messages
+			$scope.fetchMessages();
+			setInterval($scope.fetchMessages, 1000);
+			// Poll channels
+			$scope.fetchChannels();
+			setInterval($scope.fetchChannels, 5000);
+			// Poll users
+			$scope.fetchUsers();
+			setInterval($scope.fetchUsers, 1000);
+		}, response => {
+			console.error('An error occured. Server responded: ' + response.status.toString() + ' ' + response.statusText);
+			$scope.showLoginAlert();
+		});
+	}
 }]);
