@@ -2,24 +2,28 @@
 // https://stackoverflow.com/a/41753979/4375998
 
 String.prototype.hashCode = function() {
-	let hash = 5381, i = this.length
+	let hash = 5381, i = this.length;
 	while(i) {
 		hash = (hash * 33) ^ this.charCodeAt(--i)
 	}
 	return hash >>> 0;
-}
+};
 
 function messagesEqual(message1, message2) {
 	return ((message1.message === message2.message) && (message1.timestamp === message2.timestamp) && (message1.user === message2.user));
 }
 
-var app = angular.module("crappyChat", ["ngAnimate", "ngAria", "ngMessages", "ngMaterial"]);
+var app = angular.module("crappyChat", ["ngAnimate", "ngAria", "ngMessages", "ngMaterial", "ngSanitize"]);
 
-app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', function($scope, $http, $mdDialog) {
+app.filter("twemoji", function() {
+	return function(input) {
+		return twemoji.parse(input);
+	};
+}).controller("chatCtrl", ['$scope', '$http', '$mdDialog', function($scope, $http, $mdDialog) {
 	$scope.endpoint = "http://liebknecht.danielrutz.com:3000/api/chats/";
 	$scope.locked = true;
 	$scope.customFullscreen = false;
-	$scope.userName = "" // get this from login
+	$scope.userName = ""; // get this from login
 	$scope.apiUser = "";
 	$scope.apiPassword = "";
 	$scope.channels = [""];
@@ -86,13 +90,13 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', function($scope, $ht
 			$scope.currentChannel = result;
 			$scope.sendMessage("has joined the channel.")
 
-			}, function() {
+		}, function() {
 		});
 	};
 
 	$scope.sendMessage = function(message) {
 		// Clear line
-		if (!message){
+		if (!message) {
 			message = $scope.chatInput;
 			$scope.chatInput = null;
 		}
@@ -133,7 +137,7 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', function($scope, $ht
 				body: bodyString
 			});
 		}
-	}
+	};
 
 	$scope.fetchMessages = function() {
 		if ($scope.locked) {
@@ -148,7 +152,7 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', function($scope, $ht
 		}, response => {
 			console.error('An error occured. Server responded: ' + response.status.toString() + ' ' + response.statusText);
 		});
-	}
+	};
 
 	$scope.fetchChannels = function() {
 		if ($scope.locked) {
@@ -160,7 +164,7 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', function($scope, $ht
 		}, response => {
 			console.error('An error occured. Server responded: ' + response.status.toString() + ' ' + response.statusText);
 		});
-	}
+	};
 
 	$scope.setCurrentChannel = function(channel) {
 		if ($scope.channels.indexOf(channel) === -1)
@@ -174,7 +178,7 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', function($scope, $ht
 		// Force poll
 		$scope.fetchMessages();
 		$scope.fetchUsers();
-	}
+	};
 
 	$scope.fetchUsers = function() {
 		if ($scope.locked) {
@@ -186,7 +190,7 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', function($scope, $ht
 		}, response => {
 			console.error('An error occured. Server responded: ' + response.status.toString() + ' ' + response.statusText);
 		});
-	}
+	};
 
 	// check whether we are allowed to send notifications
 	if (Notification.permission !== 'granted') {

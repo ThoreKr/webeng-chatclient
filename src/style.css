@@ -105,3 +105,11 @@ body {
 .md-button:not([disabled]):hover {
 	background-color: rgba(158, 158, 158, 0.2);
 }
+
+img.emoji {
+	height: 1em;
+	width: 1em;
+	margin: 0 .05em 0 .1em;
+	vertical-align: -0.1em;
+}
+
