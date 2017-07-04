@@ -13,9 +13,9 @@ function messagesEqual(message1, message2) {
 	return ((message1.message === message2.message) && (message1.timestamp === message2.timestamp) && (message1.user === message2.user));
 }
 
-var app = angular.module("crappyChat", ["ngAnimate", "ngAria", "ngMessages", "ngMaterial", "ngSanitize", "vkEmojiPicker", "luegg.directives"]);
+var app = angular.module("crappyChat", ["ngAnimate", "ngAria", "ngMessages", "ngMaterial", "ngSanitize", "vkEmojiPicker", "luegg.directives", "ngCookies"]);
 
-app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', function($scope, $http, $mdDialog, $filter) {
+app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies', '$cookieStore', function($scope, $http, $mdDialog, $filter, $cookies, $cookieStore) {
 	$scope.endpoint = "http://liebknecht.danielrutz.com:3000/api/chats/";
 	$scope.locked = true;
 	$scope.customFullscreen = false;
@@ -53,17 +53,24 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', function(
 		);
 	};
 
-	// On load launch login form
-	$scope.showLogin();
+	// On load launch look for a cookie storing login information
+	// Otherwise open the login form
+	var loginCookie = $cookies.get('crappyLogin');
+	if (!loginCookie) {
+		$scope.showLogin();
+	} else {
+		$http.defaults.headers.common.Authorization = loginCookie;
+		checkApiCredentials();
+	}
 
-	$scope.showLoginAlert = function(ev) {
+	$scope.showLoginAlert = function(text, ev) {
 		$mdDialog.show(
 			$mdDialog.alert()
 				.parent(angular.element(document.querySelector('#layoutContainer')))
 				.clickOutsideToClose(true)
-				.title('Login Error')
+				.title(text)
 				.textContent('I\'m afraid I can\'t do that, Dave')
-				.ariaLabel('Login Error')
+				.ariaLabel(text)
 				.ok('Shit!')
 				.targetEvent(ev)
 		);
@@ -87,6 +94,7 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', function(
 			$scope.sendMessage("has joined the channel.")
 
 		}, function() {
+			// Do nothing
 		});
 	};
 
@@ -188,6 +196,19 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', function(
 		});
 	};
 
+	$scope.logout = function() {
+		// Let the cookie monster do some work
+		$scope.locked = true;
+		$scope.userName = "";
+		$scope.apiUser = "";
+		$scope.apiPassword = "";
+		clearInterval($scope.fetchMessageInterval);
+		clearInterval($scope.fetchUserInterval);
+		clearInterval($scope.fetchChannelInterval);
+		$http.defaults.headers.common.Authorization = '';
+		$cookies.remove('crappyLogin'); // Nom Nom Nom COOKIES
+	}
+
 	// check whether we are allowed to send notifications
 	if (Notification.permission !== 'granted') {
 		Notification.requestPermission();
@@ -214,16 +235,17 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', function(
 			$scope.locked = false;
 			// Poll Messages
 			$scope.fetchMessages();
-			setInterval($scope.fetchMessages, 1000);
+			$scope.fetchMessageInterval = setInterval($scope.fetchMessages, 1000);
 			// Poll channels
 			$scope.fetchChannels();
-			setInterval($scope.fetchChannels, 5000);
+			$scope.fetchChannelInterval = setInterval($scope.fetchChannels, 5000);
 			// Poll users
 			$scope.fetchUsers();
-			setInterval($scope.fetchUsers, 1000);
+			$scope.fetchUserInterval = setInterval($scope.fetchUsers, 1000);
+			$cookies.put("crappyLogin", $http.defaults.headers.common.Authorization);
 		}, response => {
 			console.error('An error occured. Server responded: ' + response.status.toString() + ' ' + response.statusText);
-			$scope.showLoginAlert();
+			$scope.showLoginAlert('Login Error');
 		});
 	}
 }]);
