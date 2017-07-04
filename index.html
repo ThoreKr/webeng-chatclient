@@ -53,8 +53,10 @@
 				</div>
 			</div>
 			<form ng-submit="sendMessage()" autocomplete="off">
-				<input id="chatInput" type="text" ng-model="chatInput" placeholder="Your message" required ng-keyup="$event.keycode === 13 && sendMessage();" ng-hide="locked">
-				<span emoji-picker="chatInput"></span>
+				<div id="input-container">
+					<input id="chatInput" type="text" ng-model="chatInput" placeholder="Your message" required ng-keyup="$event.keycode === 13 && sendMessage();" ng-hide="locked">
+					<span id="emojidings" emoji-picker="chatInput"></span>
+				</div>
 			</form>
 		</div>
 	</div>

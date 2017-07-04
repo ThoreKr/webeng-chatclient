@@ -83,10 +83,21 @@ body {
 }
 
 #chatInput {
-	width: 68%;
-	height: 30px;
-	margin-left: 1%;
-	margin-top: 1%;
+	width: 92%;
+	height: 18px;
+}
+
+#input-container {
+	width: 70%;
+	height: 12%;
+	padding: 1%;
+	margin-left: 20%;
+	margin-right: 15%;
+}
+
+#emojiding {
+	width: 14px;
+	height: 14px;
 }
 
 .md-button {
