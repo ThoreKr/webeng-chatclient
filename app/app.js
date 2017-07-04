@@ -13,7 +13,7 @@ function messagesEqual(message1, message2) {
 	return ((message1.message === message2.message) && (message1.timestamp === message2.timestamp) && (message1.user === message2.user));
 }
 
-var app = angular.module("crappyChat", ["ngAnimate", "ngAria", "ngMessages", "ngMaterial", "ngSanitize", "vkEmojiPicker"]);
+var app = angular.module("crappyChat", ["ngAnimate", "ngAria", "ngMessages", "ngMaterial", "ngSanitize", "vkEmojiPicker", "luegg.directives"]);
 
 app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', function($scope, $http, $mdDialog, $filter) {
 	$scope.endpoint = "http://liebknecht.danielrutz.com:3000/api/chats/";

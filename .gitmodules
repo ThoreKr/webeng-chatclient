@@ -1,3 +1,6 @@
 [submodule "angular-emoji-picker"]
 	path = angular-emoji-picker
 	url = https://github.com/GalochkinKirov/angular-emoji-picker.git
+[submodule "angularjs-scroll-glue"]
+	path = angularjs-scroll-glue
+	url = https://github.com/Luegg/angularjs-scroll-glue.git
