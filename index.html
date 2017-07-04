@@ -13,8 +13,9 @@
 	<!-- Angular Material Library -->
 	<script src="//ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
 
-	<!-- Twitter Twemoji for Smiley Rendering -->
-	<script src="//twemoji.maxcdn.com/2/twemoji.min.js?2.3.0"></script>
+	<!-- Emoji Rendering Support -->
+	<link rel="stylesheet" type="text/css" href="angular-emoji-picker/dist/css/emoji-picker.min.css">
+	<script src="angular-emoji-picker/dist/js/emoji-picker.min.js"></script>
 	
 	<script src="app/app.js"></script>
 </head>
@@ -40,12 +41,13 @@
 					<div class="message" ng-repeat="message in messages">
 						<div class="time">{{message.timestamp | date: 'HH:mm:ss'}}</div>
 						<div class="sender" style="color: #{{colorUser(message.user)}};">&lt;{{message.user}}&gt;</div>
-						<div ng-bind-html="message.message | twemoji">{{message.message | twemoji}}</div>
+						<div ng-bind-html="message.message">{{message.message | emojify}}</div>
 					</div>
 				</div>
 			</div>
 			<form ng-submit="sendMessage()" autocomplete="off">
 				<input id="chatInput" type="text" ng-model="chatInput" placeholder="Your message" required ng-keyup="$event.keycode === 13 && sendMessage();" ng-hide="locked">
+				<span emoji-picker="chatInput"></span>
 			</form>
 		</div>
 	</div>

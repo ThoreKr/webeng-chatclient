@@ -13,13 +13,9 @@ function messagesEqual(message1, message2) {
 	return ((message1.message === message2.message) && (message1.timestamp === message2.timestamp) && (message1.user === message2.user));
 }
 
-var app = angular.module("crappyChat", ["ngAnimate", "ngAria", "ngMessages", "ngMaterial", "ngSanitize"]);
+var app = angular.module("crappyChat", ["ngAnimate", "ngAria", "ngMessages", "ngMaterial", "ngSanitize", "vkEmojiPicker"]);
 
-app.filter("twemoji", function() {
-	return function(input) {
-		return twemoji.parse(input);
-	};
-}).controller("chatCtrl", ['$scope', '$http', '$mdDialog', function($scope, $http, $mdDialog) {
+app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', function($scope, $http, $mdDialog, $filter) {
 	$scope.endpoint = "http://liebknecht.danielrutz.com:3000/api/chats/";
 	$scope.locked = true;
 	$scope.customFullscreen = false;
@@ -97,7 +93,7 @@ app.filter("twemoji", function() {
 	$scope.sendMessage = function(message) {
 		// Clear line
 		if (!message) {
-			message = $scope.chatInput;
+			message = $filter('emojify')($scope.chatInput);
 			$scope.chatInput = null;
 		}
 		// POST it
