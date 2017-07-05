@@ -23,39 +23,39 @@
 	
 	<script src="app/app.js"></script>
 </head>
-<body ng-app="crappyChat" ng-controller="chatCtrl">
+<body data-ng-app="crappyChat" data-ng-controller="chatCtrl">
 	<div id="standard-container">
-		<div id="login-container" layout="row" layout-align="space-around center">
-			<md-button class="md-button md-primary md-raised" ng-disabled="!locked" ng-click="showLogin()">
+		<div id="login-container" data-layout="row" data-layout-align="space-around center">
+			<md-button class="md-button md-primary md-raised" data-ng-disabled="!locked" data-ng-click="showLogin()">
 				Login
 			</md-button>
-			<md-button class="md-button md-primary md-raised" ng-disabled="locked" ng-click="logout()">
+			<md-button class="md-button md-primary md-raised" data-ng-disabled="locked" data-ng-click="logout()">
 				Logout
 			</md-button>
 		</div>
-		<div id="layout-container" layout="row" layout-align="center center" ng-hide="locked">
-			<div id="channel-sidebar" class="sidebar" layout="column" layout-align="center start">
-				<md-button class="md-button md-primary md-raised" ng-disabled="locked" ng-click="createChannel()">
+		<div id="layout-container" data-layout="row" data-layout-align="center center" data-ng-hide="locked">
+			<div id="channel-sidebar" class="sidebar" data-layout="column center start">
+				<md-button class="md-button md-primary md-raised" data-ng-disabled="locked" data-ng-click="createChannel()">
 					Create Channel
 				</md-button>
-				<md-button class="md-button" ng-repeat="channel in channels" ng-disabled="locked" ng-click="setCurrentChannel(channel)">{{channel}}</md-button>
+				<md-button class="md-button" data-ng-repeat="channel in channels" data-ng-disabled="locked" data-ng-click="setCurrentChannel(channel)">{{channel}}</md-button>
 			</div>
-			<div id="user-sidebar" class="sidebar" layout="row" layout-align="center center">
-				<div class="user-sidebar-sender" ng-repeat="user in users" style="color: #{{colorUser(user)}}">{{user}}</div>
+			<div id="user-sidebar" class="sidebar" data-layout="row" data-layout-align="center center">
+				<div class="user-sidebar-sender" data-ng-repeat="user in users" style="color: #{{colorUser(user)}}">{{user}}</div>
 			</div> 
 			<div id="content-wrapper">
-				<div id="content" scroll-glue>
-					<div class="message" ng-repeat="message in messages">
+				<div id="content" data-scroll-glue>
+					<div class="message" data-ng-repeat="message in messages">
 						<div class="time">{{message.timestamp | date: 'HH:mm:ss'}}</div>
 						<div class="sender" style="color: #{{colorUser(message.user)}};">&lt;{{message.user}}&gt;</div>
 						{{message.message | emojify}}
 					</div>
 				</div>
 			</div>
-			<form ng-submit="sendMessage()" autocomplete="off">
+			<form data-ng-submit="sendMessage()" autocomplete="off">
 				<div id="input-container">
-					<input id="chatInput" type="text" ng-model="chatInput" placeholder="Your message" required ng-keyup="$event.keycode === 13 && sendMessage();" ng-hide="locked">
-					<span id="emojidings" emoji-picker="chatInput"></span>
+					<input id="chatInput" type="text" data-ng-model="chatInput" placeholder="Your message" required data-ng-keyup="$event.keycode === 13 && sendMessage();" data-ng-hide="locked">
+					<span id="emojidings" data-emoji-picker="chatInput"></span>
 				</div>
 			</form>
 		</div>
