@@ -1,6 +1,7 @@
 {
 	"ignoreFiles": [
-		"vendor/*.css"
+		"vendor/*.css",
+		"angular-emoji-picker/**/*.css"
 	],
 	"rules": {
 		"at-rule-empty-line-before": ["always", {
