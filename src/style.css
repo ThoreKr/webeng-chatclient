@@ -24,6 +24,7 @@ body {
 .sidebar {
 	height: 100%;
 	background: #404040;
+	overflow: auto;
 }
 
 #channel-sidebar {
