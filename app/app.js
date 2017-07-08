@@ -189,6 +189,7 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 			return;
 		}
 		$http.get($scope.endpoint + $scope.currentChannel + "/users").then(response => {
+			response.data.sort((a,b) => a.toLowerCase().localeCompare(b.toLowerCase()));
 			$scope.users = response.data;
 			return response.data;
 		}, response => {
