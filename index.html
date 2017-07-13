@@ -38,14 +38,14 @@
 				<md-button class="md-button md-primary md-raised" ng-disabled="locked" ng-click="createChannel()">
 					Create Channel
 				</md-button>
-				<md-button class="md-button" ng-repeat="channel in channels" ng-disabled="locked" ng-click="setCurrentChannel(channel)">{{channel}}</md-button>
+				<md-button class="md-button" ng-repeat="channel in channels | orderBy: channel" ng-disabled="locked" ng-click="setCurrentChannel(channel)">{{channel}}</md-button>
 			</div>
 			<div id="user-sidebar" class="sidebar" layout="row" layout-align="center center">
 				<div class="user-sidebar-sender" ng-repeat="user in users | orderBy: user" style="color: #{{colorUser(user)}}">{{user}}</div>
 			</div> 
 			<div id="content-wrapper">
 				<div id="content" scroll-glue>
-					<div class="message" ng-repeat="message in messages">
+					<div class="message" ng-repeat="message in messages" title="{{message.meta}}">
 						<div class="time">{{message.timestamp | date: 'HH:mm:ss'}}</div>
 						<div class="sender" style="color: #{{colorUser(message.user)}};">&lt;{{message.user}}&gt;</div>
 						{{message.message | emojify}}
