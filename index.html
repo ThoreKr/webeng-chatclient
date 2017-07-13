@@ -41,7 +41,7 @@
 				<md-button class="md-button" ng-repeat="channel in channels" ng-disabled="locked" ng-click="setCurrentChannel(channel)">{{channel}}</md-button>
 			</div>
 			<div id="user-sidebar" class="sidebar" layout="row" layout-align="center center">
-				<div class="user-sidebar-sender" ng-repeat="user in users" style="color: #{{colorUser(user)}}">{{user}}</div>
+				<div class="user-sidebar-sender" ng-repeat="user in users | orderBy: user" style="color: #{{colorUser(user)}}">{{user}}</div>
 			</div> 
 			<div id="content-wrapper">
 				<div id="content" scroll-glue>
