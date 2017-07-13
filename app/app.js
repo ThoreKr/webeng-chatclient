@@ -55,11 +55,13 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 
 	// On load launch look for a cookie storing login information
 	// Otherwise open the login form
-	var loginCookie = $cookies.get('crappyLogin');
-	if (!loginCookie) {
+	let loginCookie = $cookies.get('crappyLogin');
+	let userCookie = $cookies.get('crappyUserName');
+	if (!loginCookie || !userCookie) {
 		$scope.showLogin();
 	} else {
 		$http.defaults.headers.common.Authorization = loginCookie;
+		$scope.userName = userCookie;
 		checkApiCredentials();
 	}
 
@@ -108,7 +110,8 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 		$http.post($scope.endpoint + $scope.currentChannel,
 			JSON.stringify({
 				"message": message,
-				"user": $scope.userName
+				"user": $scope.userName,
+				"meta": "Sent with the Chaotic Crappy Chat Program (CCCР)"
 			}),
 			{
 				headers: {
@@ -243,6 +246,7 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 			$scope.fetchUsers();
 			$scope.fetchUserInterval = setInterval($scope.fetchUsers, 1000);
 			$cookies.put("crappyLogin", $http.defaults.headers.common.Authorization);
+			$cookies.put("crappyUserName", $scope.userName);
 		}, response => {
 			console.error('An error occured. Server responded: ' + response.status.toString() + ' ' + response.statusText);
 			$scope.showLoginAlert('Login Error');
