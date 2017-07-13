@@ -91,9 +91,9 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 			.cancel('Close');
 
 		$mdDialog.show(confirm).then(function(result) {
-			$scope.channels.push(result);
 			$scope.currentChannel = result;
-			$scope.sendMessage("has joined the channel.")
+			$scope.sendMessage("has joined the channel.");
+			$scope.fetchChannels();
 
 		}, function() {
 			// Do nothing
@@ -166,8 +166,9 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 			return;
 		}
 		$http.get($scope.endpoint).then(response => {
-			$scope.channels = response.data;
-			return response.data;
+			// Remove all private channels that are not mine
+			$scope.channels = response.data.filter((value) => (value.search("_x_") !== -1 && value.search($scope.userName) !== -1) || value.search("_x_") === -1);
+			return $scope.channels;
 		}, response => {
 			console.error('An error occured. Server responded: ' + response.status.toString() + ' ' + response.statusText);
 		});
