@@ -111,7 +111,7 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 			JSON.stringify({
 				"message": message,
 				"user": $scope.userName,
-				"meta": "Sent with the Chaotic Crappy Chat Program (CCCР)"
+				"meta": "Sent with the Chaotic Crappy Chat Program (СССР)"
 			}),
 			{
 				headers: {
