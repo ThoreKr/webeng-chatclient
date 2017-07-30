@@ -71,7 +71,7 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 				.parent(angular.element(document.querySelector('#layoutContainer')))
 				.clickOutsideToClose(true)
 				.title(text)
-				.textContent('I\'m afraid I can\'t do that, Dave')
+				.textContent('I\'m sorry, Dave. I\'m afraid I can\'t do that.')
 				.ariaLabel(text)
 				.ok('Shit!')
 				.targetEvent(ev)
