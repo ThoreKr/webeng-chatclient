@@ -24,13 +24,17 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 	$scope.apiPassword = "";
 	$scope.channels = [""];
 	$scope.messages = [];
+	$scope.highlightWords = [];
+	$scope.lastMessage = "";
 	$scope.users = [];
 	$scope.currentChannel = "Lobby";
+	$scope.matches = [];
+	$scope.cachedMatchIndex = "";
 	$http.defaults.headers.common.Authorization = 'Basic ' + btoa($scope.apiUser + ':' + $scope.apiPassword);
 
 	$scope.showLogin = function(ev) {
 		$mdDialog.show({
-			controller: DialogController,
+			controller: LoginDialogController,
 			templateUrl: 'app/templates/login-form.tmpl.html',
 			parent: angular.element(document.body),
 			targetEvent: ev,
@@ -75,6 +79,27 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 				.ariaLabel(text)
 				.ok('Shit!')
 				.targetEvent(ev)
+		);
+	};
+
+	$scope.showSettings = function(ev) {
+		$mdDialog.show({
+			controller: SettingsDialogController,
+			templateUrl: 'app/templates/settings-form.tmpl.html',
+			parent: angular.element(document.body),
+			targetEvent: ev,
+			clickOutsideToClose: false,
+			fullscreen: $scope.customFullscreen,
+			highlightWords: $scope.highlightWords
+		}).then(
+			function(result) {
+				if (result != null) {
+					$scope.highlightWords = result.split(",");
+				}
+			},
+			function() {
+				console.log("Cancelled");
+			}
 		);
 	};
 
@@ -123,6 +148,37 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 			console.error('An error occured. Server responded: ' + response.status.toString() + ' ' + response.statusText);
 		});
 	};
+
+	$scope.autocompleteNick = function(event) {
+		event.preventDefault(); // Stop tab from hopping through the DOM
+		// Find out whether a chat input exists
+		if (!$scope.chatInput) {
+			return;
+		}
+		// Get the last element of the input
+		var message = $scope.chatInput.split(" ");
+		var lastword = message[message.length - 1];
+		if (lastword == $scope.matches[$scope.cachedMatchIndex] && $scope.cachedMatchIndex < $scope.matches.length) {
+			message[message.length - 1] = $scope.matches[$scope.cachedMatchIndex + 1];
+			$scope.cachedMatchIndex++;
+			$scope.chatInput = message.join(" ");
+		}
+		$scope.matches = $scope.users.filter(function(user) {
+			if (user.length >= lastword.length && user.slice(0, lastword.length) === lastword) {
+				// matches return username
+				return user;
+			}
+		});
+		// no matches, do nothin
+		if ($scope.matches.length === 0) {
+			return;
+		} else { 
+			// complete
+			message[message.length - 1] = $scope.matches[0];
+			$scope.chatInput = message.join(" ");
+			$scope.cachedMatchIndex = 0;
+		}
+	}
 	
 	$scope.colorUser = function(userName) {
 		return userName.hashCode().toString(16).slice(0,6);
@@ -154,6 +210,7 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 			if($scope.messages.length > 0) { // only show notification when we haven't just switched to that channel
 				$scope.notfiyOnNewMessage(response.data);
 			}
+			
 			$scope.messages = response.data;
 			return response.data;
 		}, response => {
@@ -217,7 +274,7 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 		Notification.requestPermission();
 	}
 
-	function DialogController($scope, $mdDialog) {
+	function LoginDialogController($scope, $mdDialog) {
 		$scope.hide = function() {
 			$mdDialog.hide();
 		};
@@ -230,6 +287,18 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 			result.apiUser = apiUser;
 			result.apiPassword = apiPassword;
 			$mdDialog.hide(result);
+		};
+	}
+
+	function SettingsDialogController($scope, $mdDialog) {
+		$scope.hide = function() {
+			$mdDialog.hide();
+		};
+		$scope.cancel = function() {
+			$mdDialog.cancel();
+		};
+		$scope.answer = function(highlightWords) {
+			$mdDialog.hide(highlightWords);
 		};
 	}
 

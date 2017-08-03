@@ -32,6 +32,9 @@
 			<md-button class="md-button md-primary md-raised" ng-disabled="locked" ng-click="logout()">
 				Logout
 			</md-button>
+			<md-button class="md-button md-primary md-raised" ng-disabled="locked" ng-click="showSettings()">
+				Settings
+			</md-button>
 		</div>
 		<div id="layout-container" layout="row" layout-align="center center" ng-hide="locked">
 			<div id="channel-sidebar" class="sidebar" layout="column" layout-align="center start">
@@ -54,7 +57,7 @@
 			</div>
 			<form ng-submit="sendMessage()" autocomplete="off">
 				<div id="input-container">
-					<input id="chatInput" type="text" ng-model="chatInput" placeholder="Your message" required ng-keyup="$event.keycode === 13 && sendMessage();" ng-hide="locked">
+					<input id="chatInput" type="text" ng-model="chatInput" placeholder="Your message" required ng-keydown="(($event.which === 9 || $event.keycode === 9 ) && autocompleteNick($event)) || ($event.keycode === 13 && sendMessage());" ng-hide="locked">
 					<span id="emojidings" emoji-picker="chatInput"></span>
 				</div>
 			</form>
