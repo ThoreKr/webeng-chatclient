@@ -1,0 +1,30 @@
+<md-dialog aria-label="Settings">
+	<form ng-cloak>
+		<md-toolbar>
+			<div class="md-toolbar-tools">
+				<h2>Login</h2>
+				<span flex></span>
+			</div>
+		</md-toolbar>
+
+		<md-dialog-content layout="row" layout-align="center center">
+			<div class="md-dialog-content">
+				<h2>Settings</h2>
+				<p> A comma separated list of words to notify you about when someone mentions them</p>
+				<md-input-container class="md-block" flex-gt-sm>
+						<label>Highlight words</label>
+						<input id="highlights" type="text" ng-model="highlightWords" required>
+				</md-input-container>
+			</div>
+		</md-dialog-content>
+
+		<md-dialog-actions layout="row">
+			<md-button ng-click="cancel()">
+				Close
+			</md-button>
+			<md-button ng-click="answer(highlightWords)">
+				Save
+			</md-button>
+		</md-dialog-actions>
+	</form>
+</md-dialog>
