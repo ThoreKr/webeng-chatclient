@@ -13,10 +13,10 @@ function messagesEqual(message1, message2) {
 	return ((message1.message === message2.message) && (message1.timestamp === message2.timestamp) && (message1.user === message2.user));
 }
 
-var app = angular.module("crappyChat", ["ngAnimate", "ngAria", "ngMessages", "ngMaterial", "ngSanitize", "vkEmojiPicker", "luegg.directives", "ngCookies"]);
+let app = angular.module("crappyChat", ["ngAnimate", "ngAria", "ngMessages", "ngMaterial", "ngSanitize", "vkEmojiPicker", "luegg.directives", "ngCookies"]);
 
-app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies', '$cookieStore', function($scope, $http, $mdDialog, $filter, $cookies, $cookieStore) {
-	$scope.endpoint = "http://liebknecht.danielrutz.com:3000/api/chats/";
+app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies', function($scope, $http, $mdDialog, $filter, $cookies) {
+	$scope.endpoint = "https://liebknecht.danielrutz.com/api/chats/";
 	$scope.locked = true;
 	$scope.customFullscreen = false;
 	$scope.userName = ""; // get this from login
@@ -28,6 +28,11 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 	$scope.currentChannel = "Lobby";
 	$http.defaults.headers.common.Authorization = 'Basic ' + btoa($scope.apiUser + ':' + $scope.apiPassword);
 
+	// check whether we are allowed to send notifications
+	if (Notification.permission !== 'granted') {
+		Notification.requestPermission();
+	}
+
 	$scope.showLogin = function(ev) {
 		$mdDialog.show({
 			controller: DialogController,
@@ -38,12 +43,12 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 			fullscreen: $scope.customFullscreen
 		}).then(
 			function(result) {
-				if (result.userName != null) {
+				if (result.userName !== null) {
 					$scope.userName = result.userName;
 					$scope.apiUser = result.apiUser;
 					$scope.apiPassword = result.apiPassword;
 					$http.defaults.headers.common.Authorization = 'Basic ' + btoa($scope.apiUser + ':' + $scope.apiPassword);
-					checkApiCredentials()
+					checkApiCredentials();
 				}	
 			},
 			function() {
@@ -80,7 +85,7 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 
 	$scope.createChannel = function(ev) {
 		// Appending dialog to document.body to cover sidenav in docs app
-		var confirm = $mdDialog.prompt()
+		let confirm = $mdDialog.prompt()
 			.title('Join a new Channel')
 			.textContent('How is the channel called?')
 			.placeholder('MyChannel')
@@ -126,17 +131,12 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 	
 	$scope.colorUser = function(userName) {
 		return userName.hashCode().toString(16).slice(0,6);
-	}
+	};
 
 	$scope.notfiyOnNewMessage = function(newMessageArray) {
-		let newMessages = newMessageArray.filter(function(message) {
-			for (let oldMessageIndex in $scope.messages) {
-				if (messagesEqual(message, $scope.messages[oldMessageIndex])) {
-					return false;
-				}
-			}
-			return true;
-		});
+		let newMessages = newMessageArray.filter(message => $scope.messages.find(
+			oldMessage => messagesEqual(message, oldMessage)) === undefined
+		);
 		if (newMessages.length > 0) {
 			let bodyString = '';
 			newMessages.forEach(message => bodyString += (message.user + ' wrote: ' + message.message.substring(0, 20) + '...\n'));
@@ -167,7 +167,7 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 		}
 		$http.get($scope.endpoint).then(response => {
 			// Remove all private channels that are not mine
-			$scope.channels = response.data.filter((value) => (value.search("_x_") !== -1 && value.search($scope.userName) !== -1) || value.search("_x_") === -1);
+			$scope.channels = response.data.filter((value) => (value.search($scope.userName + "_x_.*|.*_x_" + $scope.userName) !== -1) || value.search("_x_") === -1);
 			return $scope.channels;
 		}, response => {
 			console.error('An error occured. Server responded: ' + response.status.toString() + ' ' + response.statusText);
@@ -211,12 +211,8 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 		clearInterval($scope.fetchChannelInterval);
 		$http.defaults.headers.common.Authorization = '';
 		$cookies.remove('crappyLogin'); // Nom Nom Nom COOKIES
-	}
-
-	// check whether we are allowed to send notifications
-	if (Notification.permission !== 'granted') {
-		Notification.requestPermission();
-	}
+		$cookies.remove('crappyUserName'); // still not replete
+	};
 
 	function DialogController($scope, $mdDialog) {
 		$scope.hide = function() {
@@ -226,7 +222,7 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 			$mdDialog.cancel();
 		};
 		$scope.answer = function(userName, apiUser, apiPassword) {
-			var result = {};
+			let result = {};
 			result.userName = userName;
 			result.apiUser = apiUser;
 			result.apiPassword = apiPassword;
@@ -235,7 +231,7 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 	}
 
 	function checkApiCredentials() {
-		$http.get($scope.endpoint).then(response => {
+		$http.get($scope.endpoint).then(() => {
 			$scope.locked = false;
 			// Poll Messages
 			$scope.fetchMessages();
