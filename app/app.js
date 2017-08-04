@@ -98,7 +98,7 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 			highlightWords: $scope.highlightWords
 		}).then(
 			function(result) {
-				if (result != null) {
+				if (result !== null) {
 					$scope.highlightWords = result.split(",");
 				}
 			},
@@ -161,9 +161,9 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 			return;
 		}
 		// Get the last element of the input
-		var message = $scope.chatInput.split(" ");
-		var lastword = message[message.length - 1];
-		if (lastword == $scope.matches[$scope.cachedMatchIndex] && $scope.cachedMatchIndex < $scope.matches.length) {
+		let message = $scope.chatInput.split(" ");
+		let lastword = message[message.length - 1];
+		if (lastword === $scope.matches[$scope.cachedMatchIndex] && $scope.cachedMatchIndex < $scope.matches.length) {
 			message[message.length - 1] = $scope.matches[$scope.cachedMatchIndex + 1];
 			$scope.cachedMatchIndex++;
 			$scope.chatInput = message.join(" ");
@@ -175,24 +175,30 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 			}
 		});
 		// no matches, do nothin
-		if ($scope.matches.length === 0) {
-			return;
-		} else { 
+		if ($scope.matches.length !== 0) {
 			// complete
 			message[message.length - 1] = $scope.matches[0];
 			$scope.chatInput = message.join(" ");
 			$scope.cachedMatchIndex = 0;
 		}
-	}
+	};
 	
 	$scope.colorUser = function(userName) {
 		return userName.hashCode().toString(16).slice(0,6);
 	};
 
 	$scope.notfiyOnNewMessage = function(newMessageArray) {
+		// Filter by messages that are not new
 		let newMessages = newMessageArray.filter(message => $scope.messages.find(
 			oldMessage => messagesEqual(message, oldMessage)) === undefined
 		);
+
+		// Filter by highlight words if necessary
+		if ($scope.highlightWords.length > 0)
+		{
+			newMessages = newMessages.filter(message => $scope.highlightWords.find(highlightWord => message.message.includes(highlightWord)) !== undefined);
+		}
+
 		if (newMessages.length > 0) {
 			let bodyString = '';
 			newMessages.forEach(message => bodyString += (message.user + ' wrote: ' + message.message.substring(0, 20) + '...\n'));
