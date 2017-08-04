@@ -66,12 +66,16 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 	// Otherwise open the login form
 	let loginCookie = $cookies.get('crappyLogin');
 	let userCookie = $cookies.get('crappyUserName');
+	let highlightWords = $cookies.get('highlightWords');
 	if (!loginCookie || !userCookie) {
 		$scope.showLogin();
 	} else {
 		$http.defaults.headers.common.Authorization = loginCookie;
 		$scope.userName = userCookie;
 		checkApiCredentials();
+	}
+	if (highlightWords) {
+		$scope.highlightWords = JSON.parse(highlightWords);
 	}
 
 	$scope.showLoginAlert = function(text, ev) {
@@ -95,12 +99,17 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 			targetEvent: ev,
 			clickOutsideToClose: false,
 			fullscreen: $scope.customFullscreen,
-			highlightWords: $scope.highlightWords
+			locals: {
+				highlightWords: $scope.highlightWords
+			}
 		}).then(
 			function(result) {
-				if (result !== null) {
+				if (result !== undefined) {
 					$scope.highlightWords = result.split(",");
+				} else {
+					$scope.highlightWords = [];
 				}
+				$cookies.put("highlightWords", JSON.stringify($scope.highlightWords));
 			},
 			function() {
 				console.log("Cancelled");
@@ -274,7 +283,8 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 		clearInterval($scope.fetchChannelInterval);
 		$http.defaults.headers.common.Authorization = '';
 		$cookies.remove('crappyLogin'); // Nom Nom Nom COOKIES
-		$cookies.remove('crappyUserName'); // still not replete
+		$cookies.remove('crappyUserName');
+		$cookies.remove('highlightWords');
 	};
 
 	function LoginDialogController($scope, $mdDialog) {
@@ -293,7 +303,10 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 		};
 	}
 
-	function SettingsDialogController($scope, $mdDialog) {
+	function SettingsDialogController($scope, $mdDialog, highlightWords) {
+		if (highlightWords.length > 0) {
+			$scope.highlightWords = highlightWords.join(",");
+		}
 		$scope.hide = function() {
 			$mdDialog.hide();
 		};
