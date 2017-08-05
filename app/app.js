@@ -332,6 +332,9 @@ app.controller("chatCtrl", ['$scope', '$http', '$mdDialog', '$filter', '$cookies
 			$scope.fetchUserInterval = setInterval($scope.fetchUsers, 1000);
 			$cookies.put("crappyLogin", $http.defaults.headers.common.Authorization);
 			$cookies.put("crappyUserName", $scope.userName);
+			if ($scope.highlightWords.length < 1) {
+				$scope.highlightWords = [$scope.userName];
+			}
 		}, response => {
 			console.error('An error occured. Server responded: ' + response.status.toString() + ' ' + response.statusText);
 			$scope.showLoginAlert('Login Error');
