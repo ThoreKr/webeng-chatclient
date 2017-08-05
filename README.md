@@ -31,5 +31,5 @@ We have included a few external libraries. These were:
   * We can create channels
   * When composing messages pressing the Tab-Key can help you autocompleting nicknames
   * The client is able to notify on certain keywords, which can be set in the settings menu.
-  * Login data and settings are stored in cookies and so persisten through reloads
+  * Login data and settings are stored in cookies and so persistent through reloads
   * Converting smileys from words like :joy: to the unicode equivalents
