@@ -7,5 +7,10 @@ The client won't just run from the local file system because of the strict secur
 ```shell
 python -m SimpleHTTPServer 8080
 ```
+with Python 2 or
+```shell
+python -m http.server 8080
+```
+with Python 3
 inside the root directory of the client to start a local HTTP Server.
 Then, you should be able to access it using a good web browser (not IE!) under the webpage <http://localhost:8080>.
